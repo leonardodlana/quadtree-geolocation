@@ -1,15 +1,20 @@
 # quadtree-geolocation
 
-Quadtree is a tree data structure that has 4 "children", each of these children have 4 more each one, and so on, until the specified granularity is achieved.
+Quadtree is a tree data structure that has 4 "children", each of these children have 4 more children each one, and so on, until the specified granularity is achieved.
 
-(Image of 2d representation of quadtree)
+For optimization purpouse, the children are only created when necessary, for example, in the image below we can see the representation of the quadtree when we add 1 point of interest.
 
-This structure is beautiful in so many ways, there's a lot of usages. The most common usages are:
-*Optimization of rendering on games 
-*Dynamic lighthing effect on games
-*Geolocation
-*Image compression
-*A.I. Path fingind
+![Quadtree depth](https://poppicture-57876.firebaseapp.com/quadtree/quadtree-depth.png)
+
+![Quadtree gif](https://poppicture-57876.firebaseapp.com/quadtree/quadtree.gif)
+
+This structure is beautiful in so many ways, there's a lot of usages that can really improve applications. The most common usages are:
+
+* Optimization of rendering on games 
+* Dynamic lighthing effect on games
+* Geolocation
+* Image compression
+* A.I. Path finding
 
 For this example, we'll use the quadtree for optimizing Geolocation. Imagine that we have an app that shows the user other users around them, or pictures around them.
 
@@ -31,6 +36,7 @@ Fortunately, we can represent our planet in a 2D map, using latitude and longitu
 ![World map in 2D latitude and longitude](http://cse.ssl.berkeley.edu/segwayEd/lessons/search_ice_snow/worldmapL.gif)
 
 Longitude -180 to 180
+
 Latitude -90 to 90
 
 Great! Now we know that we can create a quadtree to represent the whole world. First we need to define the size of the deepest node/child, let's say the deepest node will have 1km * 1km.

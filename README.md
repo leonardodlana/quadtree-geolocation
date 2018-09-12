@@ -2,11 +2,13 @@
 
 Quadtree is a tree data structure that has 4 "children", each of these children have 4 more children each one, and so on, until the specified granularity is achieved.
 
-For optimization purpouse, the children are only created when necessary, for example, in the image below we can see the representation of the quadtree when we add 1 point of interest.
+For optimization purpouse, the children are only created when necessary, for example, in the image below we can see the representation of the quadtree.
 
 ![Quadtree depth](https://poppicture-57876.firebaseapp.com/quadtree/quadtree-depth.png)
 
 ![Quadtree gif](https://poppicture-57876.firebaseapp.com/quadtree/quadtree.gif)
+
+![Quadtree gif](https://poppicture-57876.firebaseapp.com/quadtree/quadtree-mouse.gif)
 
 This structure is beautiful in so many ways, there's a lot of usages that can really improve applications. The most common usages are:
 
@@ -28,15 +30,18 @@ As we know, the formula to calculate the distance between two points is:
 
 The problem starts here, SQRT functions are CPU expensive, imagine that our backend would need to do this for each request against all users on the database. 
 
+
 ![Distance between User A and others](https://poppicture-57876.firebaseapp.com/quadtree/step2.png)
+
 
 We could even add some filters to help, maybe compare only the same country, or city. Even so, it's not sustainable.
 Fortunately, we can represent our planet in a 2D map, using latitude and longitude.
 
+
 ![World map in 2D latitude and longitude](http://cse.ssl.berkeley.edu/segwayEd/lessons/search_ice_snow/worldmapL.gif)
 
-Longitude -180 to 180
 
+Longitude -180 to 180
 Latitude -90 to 90
 
 Great! Now we know that we can create a quadtree to represent the whole world. First we need to define the size of the deepest node/child, let's say the deepest node will have 1km * 1km.

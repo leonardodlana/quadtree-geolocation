@@ -6,8 +6,6 @@ For optimization purpouse, the children are only created when necessary, for exa
 
 ![Quadtree depth](https://poppicture-57876.firebaseapp.com/quadtree/quadtree-depth.png)
 
-![Quadtree gif](https://poppicture-57876.firebaseapp.com/quadtree/quadtree.gif)
-
 ![Quadtree gif](https://poppicture-57876.firebaseapp.com/quadtree/quadtree-mouse.gif)
 
 This structure is beautiful in so many ways, there's a lot of usages that can really improve applications. The most common usages are:

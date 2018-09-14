@@ -1,4 +1,4 @@
-# quadtree-geolocation
+# Quadtree for geolocation
 
 Quadtree is a tree data structure that has 4 "children", each of these children have 4 more children each one, and so on, until the specified granularity is achieved.
 
@@ -42,4 +42,7 @@ Fortunately, we can represent our planet in a 2D map, using latitude and longitu
 Longitude -180 to 180
 Latitude -90 to 90
 
-Great! Now we know that we can create a quadtree to represent the whole world. First we need to define the size of the deepest node/child, let's say the deepest node will have 1km * 1km.
+Great! Now we know that we can create a quadtree to represent the whole world. First we need to define the size of the deepest node/child, let's say the deepest node will have 100km * 100km. Then we'll add 1 million points of interest. To be able to show the insertion, i had to slow down the gif. 
+
+![World Quadtree insertion gif](https://poppicture-57876.firebaseapp.com/quadtree/world-quadtree.gif)
+

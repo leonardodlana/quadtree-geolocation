@@ -46,3 +46,6 @@ Great! Now we know that we can create a quadtree to represent the whole world. F
 
 ![World Quadtree insertion gif](https://poppicture-57876.firebaseapp.com/quadtree/world-quadtree.gif)
 
+Now, we are going to use the mouse pointer as the center of our search, the area is going to be 100km, therefore, any point of interest within 100km of the mouse pointer will be selected.
+
+![World Quadtree insertion gif](https://poppicture-57876.firebaseapp.com/quadtree/world-quadtree-search.gif)

@@ -1,6 +1,8 @@
 # Quadtree for geolocation
 
-Quadtree is a tree data structure that has 4 "children", each of these children have 4 more children each one, and so on, until the specified granularity is achieved.
+Quadtree is a tree data structure that has 4 "children", often called nodes, each of these nodes have 4 more nodes within and so on, until the specified granularity is achieved.
+
+
 
 For optimization purpouse, the children are only created when necessary, for example, in the image below we can see the representation of the quadtree.
 
@@ -49,3 +51,9 @@ Great! Now we know that we can create a quadtree to represent the whole world. F
 Now, we are going to use the mouse pointer as the center of our search, the area is going to be 100km, therefore, any point of interest within 100km of the mouse pointer will be selected.
 
 ![World Quadtree insertion gif](https://poppicture-57876.firebaseapp.com/quadtree/world-quadtree-search.gif)
+
+Using the example above, it does not take even a millisecond to get the search results. Running the same example with 10 million points we got the same results.
+
+![World Quadtree insertion gif](https://poppicture-57876.firebaseapp.com/quadtree/world-quadtree-10kk-search.gif)
+
+There's no limitation to the depth of a quadtree, we could set the size of the last node to 1km * 1km if we wanted to, that would save a lot of process power and time.

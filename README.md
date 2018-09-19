@@ -41,7 +41,7 @@ Fortunately, we can represent our planet in a 2D map, using latitude and longitu
 ![World map in 2D latitude and longitude](http://cse.ssl.berkeley.edu/segwayEd/lessons/search_ice_snow/worldmapL.gif)
 
 
-Longitude -180 to 180
+Longitude -180 to 180  
 Latitude -90 to 90
 
 Great! Now we know that we can create a quadtree to represent the whole world. First we need to define the size of the deepest node/child, let's say the deepest node will have 100km * 100km. Then we'll add 1 million points of interest. To be able to show the insertion, i had to slow down the gif. 
@@ -205,6 +205,126 @@ As explained before, nodes are only created when it's necessary. When a point of
             return mTopRightNode != null ? mTopRightNode : (mTopRightNode = new QuadTreeNode(mBounds.y, mBounds.x + halfWidth, halfHeight, halfWidth));
 
         return mBottomRightNode != null ? mBottomRightNode : (mBottomRightNode = new QuadTreeNode(mBounds.y + halfHeight, mBounds.x + halfWidth, halfHeight, halfWidth));
+    }
+```
+
+We are almost done with our quadtree node, we just need a method to locate points of interest. The perfect scenario would be where our point of search + range are completely contained inside a node, but we are developers, we have to be ready for the worst case scenario. We can divide our locate method in 2 parts:
+
+1- Navigate until not fully contained  
+2- Use intersection  
+
+![Quadtree find example](https://poppicture-57876.firebaseapp.com/quadtree/quadtree-find-explanation.png)
+
+Our search area is represented by the red rectangle, the navigation steps are these:
+
+* The blue area "1" **fully contains** our search area.  
+* The top right child of area "1" represented by area "2" **fully contains** our search area.  
+* The bottom left child of area "2" represented by area "3" **fully contains** our search area.  
+* None of the children from area "3" fully contains our search area, but, they **intersect**
+    When intersection occurs, we will have to descend in every node that intersects  
+* Finally when we reach each deepest node, if fully contained we add all the points of interest, otherwise we check if the search area contains each point of interest.  
+
+```java
+/**
+     * Recursively search for neighbours inside the given rectangle
+     * @param neighbourSet a set to be filled by this method
+     * @param rangeAsRectangle the area of interest
+     */
+    public void findNeighboursWithinRectangle(Set<Neighbour> neighbourSet, Rectangle2D.Double rangeAsRectangle) {
+        boolean end;
+
+        // In case of containing the whole area of interest
+        if (mBounds.contains(rangeAsRectangle)) {
+            end = true;
+
+            // If end is true, it means that we are on the deepest node
+            // otherwise we should keep going deeper
+
+            if (mTopLeftNode != null) {
+                mTopLeftNode.findNeighboursWithinRectangle(neighbourSet, rangeAsRectangle);
+                end = false;
+            }
+
+            if (mBottomLeftNode != null) {
+                mBottomLeftNode.findNeighboursWithinRectangle(neighbourSet, rangeAsRectangle);
+                end = false;
+            }
+
+            if (mTopRightNode != null) {
+                mTopRightNode.findNeighboursWithinRectangle(neighbourSet, rangeAsRectangle);
+                end = false;
+            }
+
+            if (mBottomRightNode != null) {
+                mBottomRightNode.findNeighboursWithinRectangle(neighbourSet, rangeAsRectangle);
+                end = false;
+            }
+
+
+            if (end)
+                addNeighbors(true, neighbourSet, rangeAsRectangle);
+
+            return;
+        }
+
+        // In case of intersection with the area of interest
+        if (mBounds.intersects(rangeAsRectangle)) {
+            end = true;
+
+            // If end is true, it means that we are on the deepest node
+            // otherwise we should keep going deeper
+
+            if (mTopLeftNode != null) {
+                mTopLeftNode.findNeighboursWithinRectangle(neighbourSet, rangeAsRectangle);
+                end = false;
+            }
+
+            if (mBottomLeftNode != null) {
+                mBottomLeftNode.findNeighboursWithinRectangle(neighbourSet, rangeAsRectangle);
+                end = false;
+            }
+
+            if (mTopRightNode != null) {
+                mTopRightNode.findNeighboursWithinRectangle(neighbourSet, rangeAsRectangle);
+                end = false;
+            }
+
+            if (mBottomRightNode != null) {
+                mBottomRightNode.findNeighboursWithinRectangle(neighbourSet, rangeAsRectangle);
+                end = false;
+            }
+
+            if (end)
+                addNeighbors(false, neighbourSet, rangeAsRectangle);
+        }
+    }
+    
+    /**
+     * Adds neighbours to the found set
+     * @param contains if the rangeAsRectangle is contained inside the node
+     * @param neighborSet a set to be filled by this method
+     * @param rangeAsRectangle the area of interest
+     */
+    private void addNeighbors(boolean contains, Set<Neighbour> neighborSet, Rectangle2D.Double rangeAsRectangle) {
+        if (contains) {
+            neighborSet.addAll(mNeighbours);
+            return;
+        }
+
+        findAll(neighborSet, rangeAsRectangle);
+    }
+
+    /**
+     * If the rangeAsRectangle is not contained inside this node we must
+     * search for neighbours that are contained inside the rangeAsRectangle
+     * @param neighborSet a set to be filled by this method
+     * @param rangeAsRectangle the area of interest
+     */
+    private void findAll(Set<Neighbour> neighborSet, Rectangle2D.Double rangeAsRectangle) {
+        for (Neighbour neighbor : mNeighbours) {
+            if (rangeAsRectangle.contains(neighbor.getLongitude(), neighbor.getLatitude()))
+                neighborSet.add(neighbor);
+        }
     }
 ```
 
@@ -495,4 +615,116 @@ public class QuadTreeNode {
     }
     
 }
+```
+Now that our quadtree node is done, we need a "wrapper", the class that will have the root quadtree node.
+
+```java
+/**
+ * Created by Leonardo Lana
+ * Github: https://github.com/leonardodlana
+ * <p>
+ * Copyright 2018 Leonardo Lana
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * ============================================================================
+ *
+ * This class is the wrapper between the "view" and the quadtree data structure.
+ *
+ * Few notes/explanations:
+ *
+ * The {@link Rectangle2D.Double} does not support negative bounds. Having this limitation
+ * in mind we need to normalize the latitude and longitude.
+ *
+ * But why TOTAL_X_DEGREES is 360 and TOTAL_Y_DEGREES is 180?
+ *
+ * That's the 2d representation of the world in latitude/longitude degrees.
+ * @see <a href="http://fortunedream.info/wp-content/uploads/2018/01/latitude-map-of-the-world-maps-lines-longitude-and-interactive-locator.jpg">Globe 2D Projection</a>
+ *
+ */
+
+public class QuadTree {
+
+    public static final int TOTAL_X_DEGREES = 360; // -180 to 180 - longitude
+    public static final int TOTAL_Y_DEGREES = 180; // -90 to 90   - latitude
+    private static final int NORMALIZE_X = 180;
+    private static final int NORMALIZE_Y = 90;
+
+    private QuadTreeNode mRootNode;
+
+    public QuadTree() {
+        mRootNode = new QuadTreeNode(0, 0, TOTAL_Y_DEGREES, TOTAL_X_DEGREES);
+    }
+
+    public QuadTree(QuadTreeNode rootNode) {
+        mRootNode = rootNode;
+    }
+
+    public synchronized void addNeighbour(long id, double latitude, double longitude) {
+        Neighbour neighbour = new NeighbourImpl(id, normalizeLatitude(latitude),
+                normalizeLongitude(longitude));
+        mRootNode.addNeighbour(neighbour, QuadTreeConstants.QUADTREE_LAST_NODE_SIZE_IN_DEGREE);
+    }
+
+    public void removeNeighbour(long id) {
+        mRootNode.removeNeighbour(id);
+    }
+
+    public Set<Neighbour> findNeighbours(double latitude, double longitude, double rangeInKm) {
+        Set<Neighbour> neighbourSet = new HashSet<>();
+        double rangeInDegrees = QuadTreeConstants.kmToDegree(rangeInKm);
+        Rectangle2D.Double areaOfInterest = getRangeAsRectangle(normalizeLatitude(latitude), normalizeLongitude(longitude), rangeInDegrees);
+        mRootNode.findNeighboursWithinRectangle(neighbourSet, areaOfInterest);
+        return neighbourSet;
+    }
+
+    public Set<Long> findNeighboursIds(double latitude, double longitude, double rangeInKm) {
+        Set<Neighbour> neighbourSet = findNeighbours(latitude, longitude, rangeInKm);
+        Set<Long> neighboursIds = new HashSet<>();
+
+        for(Neighbour neighbour : neighbourSet)
+            neighboursIds.add(neighbour.getId());
+
+        return neighboursIds;
+    }
+
+    protected QuadTreeNode getRootNode() {
+        return mRootNode;
+    }
+
+    private double normalizeLatitude(double latitude) {
+        return latitude + NORMALIZE_Y;
+    }
+
+    private double normalizeLongitude(double longitude) {
+        return longitude + NORMALIZE_X;
+    }
+
+    private Rectangle2D.Double getRangeAsRectangle(double latitude, double longitude, double range) {
+        /*
+           We need to centralize the point and have the range on every direction
+         */
+        return new Rectangle2D.Double(Math.max(longitude - range, 0),
+                Math.max(latitude - range, 0),
+                Math.min(range * 2, TOTAL_X_DEGREES),
+                Math.min(range * 2, TOTAL_Y_DEGREES));
+    }
+
+}
+
+Well, that's it folks, i hope you like this data structure as much as i do.
+If you have any questions or feedbacks, please let me know.
+
+See ya!
+
 ```

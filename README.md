@@ -4,7 +4,7 @@ Quadtree is a tree data structure that has 4 "children", often called nodes, eac
 
 
 
-For optimization purpouse, the children are only created when necessary, for example, in the image below we can see the representation of the quadtree.
+For optimization purpose, the children are only created when necessary, for example, in the image below we can see the representation of the quadtree.
 
 ![Quadtree depth](https://poppicture-57876.firebaseapp.com/quadtree/quadtree-depth.png)
 
@@ -13,7 +13,7 @@ For optimization purpouse, the children are only created when necessary, for exa
 This structure is beautiful in so many ways, there's a lot of usages that can really improve applications. The most common usages are:
 
 * Optimization of rendering on games 
-* Dynamic lighthing effect on games
+* Dynamic lighting effect on games
 * Geolocation
 * Image compression
 * A.I. Path finding
